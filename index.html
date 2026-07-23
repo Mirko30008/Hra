@@ -14,73 +14,135 @@
 }
 
 body{
-    background:#111;
-    color:white;
+    margin:0;
     overflow:hidden;
-}
-
-#game{
-    width:100vw;
-    height:100vh;
+    font-family:Arial,sans-serif;
     display:flex;
     justify-content:center;
     align-items:center;
-    transition:.8s;
+    height:100vh;
+    background:linear-gradient(-45deg,#111,#1b1b3a,#121212,#25124a);
+    background-size:400% 400%;
+    animation:bgMove 12s ease infinite;
 }
 
-.progress-container{
-    position:fixed;
-    top:20px;
-    left:50%;
-    transform:translateX(-50%);
-    width:80%;
-    height:18px;
-    background:#333;
-    border-radius:20px;
-    overflow:hidden;
+@keyframes bgMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
 }
 
-.progress{
-    width:0%;
-    height:100%;
-    background:linear-gradient(90deg,#00ff88,#00ffee);
-    transition:width 0.05s linear;
-}
-
-button{
-    padding:22px 45px;
-    font-size:28px;
-    border:none;
-    border-radius:15px;
-    background:#00c853;
-    color:white;
-    cursor:pointer;
-    transition:.2s;
-}
-
-button:hover{
-    transform:scale(1.05);
+#game{
+    transition:1s;
 }
 
 .blur{
     filter:blur(10px);
 }
 
+button{
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    border:none;
+    cursor:pointer;
+
+    font-size:38px;
+    font-weight:bold;
+    letter-spacing:4px;
+
+    color:white;
+
+    background:linear-gradient(135deg,#7b2cff,#00c8ff);
+
+    animation:pulse 2s infinite;
+
+    transition:.2s;
+}
+
+@keyframes pulse{
+
+    0%{
+        transform:scale(1);
+        box-shadow:0 0 20px rgba(123,44,255,.4);
+    }
+
+    50%{
+        transform:scale(1.08);
+        box-shadow:0 0 45px rgba(0,200,255,.6);
+    }
+
+    100%{
+        transform:scale(1);
+        box-shadow:0 0 20px rgba(123,44,255,.4);
+    }
+
+}
+
+button.holding{
+
+    animation:none;
+
+    transform:scale(1.1);
+
+    box-shadow:
+        0 0 40px #7b2cff,
+        0 0 80px #7b2cff,
+        0 0 120px #00c8ff,
+        0 0 180px #00c8ff;
+
+}
+
 #winner{
+
     position:fixed;
     inset:0;
+
     display:flex;
     justify-content:center;
     align-items:center;
-    font-size:80px;
-    font-weight:bold;
+
+    font-size:110px;
+    font-weight:900;
+
+    color:white;
+
     opacity:0;
+
+    transform:scale(.3);
+
     transition:1s;
-    pointer-events:none;
+
+    text-shadow:
+        0 0 15px white,
+        0 0 40px #00c8ff,
+        0 0 70px #7b2cff;
 }
 
 #winner.show{
+
     opacity:1;
+
+    transform:scale(1);
+
+    animation:win 1s ease forwards;
+
+}
+
+@keyframes win{
+
+    0%{
+        transform:scale(.2) rotate(-10deg);
+    }
+
+    60%{
+        transform:scale(1.25) rotate(4deg);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+
 }
 </style>
 
@@ -110,10 +172,12 @@ const btn = document.getElementById("holdBtn");
 
 function startHolding(){
     holding = true;
+    btn.classList.add("holding");
 }
 
 function stopHolding(){
     holding = false;
+    btn.classList.remove("holding");
 }
 
 btn.addEventListener("mousedown",startHolding);
