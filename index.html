@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hold to Win</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#111;
+    color:white;
+    overflow:hidden;
+}
+
+#game{
+    width:100vw;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    transition:.8s;
+}
+
+.progress-container{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    width:80%;
+    height:18px;
+    background:#333;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.progress{
+    width:0%;
+    height:100%;
+    background:linear-gradient(90deg,#00ff88,#00ffee);
+    transition:width 0.05s linear;
+}
+
+button{
+    padding:22px 45px;
+    font-size:28px;
+    border:none;
+    border-radius:15px;
+    background:#00c853;
+    color:white;
+    cursor:pointer;
+    transition:.2s;
+}
+
+button:hover{
+    transform:scale(1.05);
+}
+
+.blur{
+    filter:blur(10px);
+}
+
+#winner{
+    position:fixed;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:80px;
+    font-weight:bold;
+    opacity:0;
+    transition:1s;
+    pointer-events:none;
+}
+
+#winner.show{
+    opacity:1;
+}
+</style>
+
+</head>
+<body>
+
+<div class="progress-container">
+    <div class="progress" id="progress"></div>
+</div>
+
+<div id="game">
+    <button id="holdBtn">Hold Me</button>
+</div>
+
+<div id="winner">
+    🎉 You Win! 🎉
+</div>
+
+<script>
+const holdTime = 180000; // 3 minúty
+
+let holding = false;
+let progress = 0;
+
+const progressBar = document.getElementById("progress");
+const btn = document.getElementById("holdBtn");
+
+function startHolding(){
+    holding = true;
+}
+
+function stopHolding(){
+    holding = false;
+}
+
+btn.addEventListener("mousedown",startHolding);
+btn.addEventListener("mouseup",stopHolding);
+btn.addEventListener("mouseleave",stopHolding);
+
+btn.addEventListener("touchstart",(e)=>{
+    e.preventDefault();
+    startHolding();
+});
+
+btn.addEventListener("touchend",stopHolding);
+
+const interval = 20;
+
+setInterval(()=>{
+
+    if(holding){
+        progress += interval;
+
+        if(progress>holdTime)
+            progress=holdTime;
+
+        progressBar.style.width=(progress/holdTime*100)+"%";
+
+        if(progress>=holdTime){
+
+            document.getElementById("game").classList.add("blur");
+
+            document.querySelector(".progress-container").classList.add("blur");
+
+            document.getElementById("winner").classList.add("show");
+
+        }
+
+    }
+
+},interval);
+</script>
+
+</body>
+  </html>
