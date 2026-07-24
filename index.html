@@ -1,39 +1,302 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hold to Win</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hold to Win</title>
 
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial,sans-serif;
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #111827, #312e81);
+            background-size: 400% 400%;
+            animation: bgMove 12s ease infinite;
+        }
+
+        @keyframes bgMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Horný panel s progresom */
+        .hud-container {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 85%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            transition: filter 0.5s ease;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50px;
+            padding: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .progress {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #06b6d4, #8b5cf6);
+            border-radius: 50px;
+            transition: width 0.05s linear;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.7);
+        }
+
+        .status-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            letter-spacing: 2px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Herná zóna a tlačidlo */
+        #game {
+            transition: filter 0.8s ease, transform 0.8s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .blur {
+            filter: blur(15px);
+            pointer-events: none;
+            transform: scale(0.9);
+        }
+
+        button {
+            width: 190px;
+            height: 190px;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            outline: none;
+            animation: pulse 2.5s infinite ease-in-out;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(139, 92, 246, 0.4), 0 10px 25px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 40px rgba(6, 182, 212, 0.6), 0 10px 25px rgba(0, 0, 0, 0.3);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(139, 92, 246, 0.4), 0 10px 25px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        button:active, button.holding {
+            animation: none;
+            transform: scale(0.95);
+            background: linear-gradient(135deg, #a78bfa, #22d3ee);
+            box-shadow:
+                0 0 30px #8b5cf6,
+                0 0 60px #06b6d4,
+                inset 0 0 15px rgba(255,255,255,0.5);
+        }
+
+        /* Výherná obrazovka */
+        #winner {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.8);
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+
+        #winner.show {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+        }
+
+        .win-title {
+            font-size: 3rem;
+            font-weight: 900;
+            color: white;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow:
+                0 0 20px rgba(255,255,255,0.6),
+                0 0 40px #06b6d4,
+                0 0 80px #8b5cf6;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Resetovacie tlačidlo po výhre */
+        .reset-btn {
+            padding: 12px 30px;
+            width: auto;
+            height: auto;
+            border-radius: 30px;
+            font-size: 16px;
+            letter-spacing: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid white;
+            animation: none;
+            box-shadow: none;
+        }
+        .reset-btn:hover {
+            background: white;
+            color: #0f172a;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+<div class="hud-container" id="hud">
+    <div class="progress-container">
+        <div class="progress" id="progress"></div>
+    </div>
+    <div class="status-text" id="statusLabel">Podrž pre štart</div>
+</div>
+
+<div id="game">
+    <button id="holdBtn">Drž ma</button>
+</div>
+
+<div id="winner">
+    <div class="win-title">🎉 Vyhral si! 🎉</div>
+    <button class="reset-btn" onclick="resetGame()">Hrať znova</button>
+</div>
+
+<script>
+const holdTime = 180000; // 3 minúty (180 000 ms)
+const intervalTime = 50;  // Aktualizácia každých 50ms pre plynulosť a nižšiu záťaž procesora
+
+let holding = false;
+let progress = 0;
+let gameLoop = null;
+
+const progressBar = document.getElementById("progress");
+const statusLabel = document.getElementById("statusLabel");
+const btn = document.getElementById("holdBtn");
+const gameContainer = document.getElementById("game");
+const hudContainer = document.getElementById("hud");
+const winnerScreen = document.getElementById("winner");
+
+function startHolding(e) {
+    if (progress >= holdTime) return;
+    if (e) e.preventDefault();
+    
+    holding = true;
+    btn.classList.add("holding");
+    statusLabel.textContent = "Nabíjam...";
+
+    if (!gameLoop) {
+        gameLoop = setInterval(() => {
+            if (holding) {
+                progress += intervalTime;
+
+                if (progress > holdTime) progress = holdTime;
+
+                // Výpočet percent a vizuálna aktualizácia
+                const percentage = (progress / holdTime) * 100;
+                progressBar.style.width = percentage + "%";
+                statusLabel.textContent = `Progres: ${Math.floor(percentage)}%`;
+
+                // Kontrola výhry
+                if (progress >= holdTime) {
+                    triggerWin();
+                }
+            }
+        }, intervalTime);
+    }
 }
 
-body{
-    margin:0;
-    overflow:hidden;
-    font-family:Arial,sans-serif;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    background:linear-gradient(-45deg,#111,#1b1b3a,#121212,#25124a);
-    background-size:400% 400%;
-    animation:bgMove 12s ease infinite;
+function stopHolding() {
+    holding = false;
+    btn.classList.remove("holding");
+    if (progress < holdTime) {
+        statusLabel.textContent = "Prerušené - drž ďalej";
+    }
+    if (gameLoop) {
+        clearInterval(gameLoop);
+        gameLoop = null;
+    }
 }
 
-@keyframes bgMove{
-    0%{background-position:0% 50%;}
-    50%{background-position:100% 50%;}
-    100%{background-position:0% 50%;}
+function triggerWin() {
+    stopHolding();
+    gameContainer.classList.add("blur");
+    hudContainer.classList.add("blur");
+    winnerScreen.classList.add("show");
 }
 
-#game{
-    transition:1s;
+function resetGame() {
+    progress = 0;
+    holding = false;
+    progressBar.style.width = "0%";
+    statusLabel.textContent = "Podrž pre štart";
+    gameContainer.classList.remove("blur");
+    hudContainer.classList.remove("blur");
+    winnerScreen.classList.remove("show");
+}
+
+// Podpora pre myš aj dotykové obrazovky pomocou Pointer Events
+btn.addEventListener("pointerdown", startHolding);
+window.addEventListener("pointerup", stopHolding); // Registrácia na window zabezpečí stop, aj keď pustíte mimo tlačidla
+
+// Fix pre staršie mobilné prehliadače a zamedzenie zoomovania
+btn.addEventListener("touchstart", startHolding, { passive: false });
+btn.addEventListener("touchend", stopHolding);
+</script>
+
+</body>
+</html>
 }
 
 .blur{
