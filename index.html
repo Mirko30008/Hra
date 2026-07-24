@@ -260,7 +260,7 @@ function stopHolding() {
     holding = false;
     btn.classList.remove("holding");
     if (progress < holdTime) {
-        statusLabel.textContent = "Interrupted;
+        statusLabel.textContent = "Interrupted";
     }
     if (gameLoop) {
         clearInterval(gameLoop);
@@ -289,9 +289,6 @@ function resetGame() {
 btn.addEventListener("pointerdown", startHolding);
 window.addEventListener("pointerup", stopHolding); // Registrácia na window zabezpečí stop, aj keď pustíte mimo tlačidla
 
-// Fix pre staršie mobilné prehliadače a zamedzenie zoomovania
-btn.addEventListener("touchstart", startHolding, { passive: false });
-btn.addEventListener("touchend", stopHolding);
 </script>
 
 </body>
