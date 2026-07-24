@@ -201,15 +201,15 @@
     <div class="progress-container">
         <div class="progress" id="progress"></div>
     </div>
-    <div class="status-text" id="statusLabel">Podrž pre štart</div>
+    <div class="status-text" id="statusLabel">HOLD to start</div>
 </div>
 
 <div id="game">
-    <button id="holdBtn">Drž ma</button>
+    <button id="holdBtn">HOLD</button>
 </div>
 
 <div id="winner">
-    <div class="win-title">🎉 Vyhral si! 🎉</div>
+    <div class="win-title">You win!</div>
     <button class="reset-btn" onclick="resetGame()">Hrať znova</button>
 </div>
 
@@ -234,7 +234,6 @@ function startHolding(e) {
     
     holding = true;
     btn.classList.add("holding");
-    statusLabel.textContent = "Nabíjam...";
 
     if (!gameLoop) {
         gameLoop = setInterval(() => {
@@ -261,7 +260,7 @@ function stopHolding() {
     holding = false;
     btn.classList.remove("holding");
     if (progress < holdTime) {
-        statusLabel.textContent = "Prerušené - drž ďalej";
+        statusLabel.textContent = "Interrupted;
     }
     if (gameLoop) {
         clearInterval(gameLoop);
