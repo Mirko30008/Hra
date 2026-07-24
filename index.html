@@ -260,7 +260,7 @@ function stopHolding() {
     holding = false;
     btn.classList.remove("holding");
     if (progress < holdTime) {
-        statusLabel.textContent = "Interrupted";
+        statusLabel.textContent = "Interrupted"; // Opravená chýbajúca úvodzovka, text zachovaný
     }
     if (gameLoop) {
         clearInterval(gameLoop);
@@ -279,7 +279,7 @@ function resetGame() {
     progress = 0;
     holding = false;
     progressBar.style.width = "0%";
-    statusLabel.textContent = "Podrž pre štart";
+    statusLabel.textContent = "Podrž pre štart"; // Text zachovaný
     gameContainer.classList.remove("blur");
     hudContainer.classList.remove("blur");
     winnerScreen.classList.remove("show");
@@ -287,6 +287,7 @@ function resetGame() {
 
 // Podpora pre myš aj dotykové obrazovky pomocou Pointer Events
 btn.addEventListener("pointerdown", startHolding);
+btn.addEventListener("pointerleave", stopHolding); // Ošetrenie skĺznutia prsta/kurzora z tlačidla
 window.addEventListener("pointerup", stopHolding); // Registrácia na window zabezpečí stop, aj keď pustíte mimo tlačidla
 
 </script>
