@@ -35,7 +35,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Horný panel s progresom - pevný, nikam neodlieta */
+        /* Horný panel s progresom - pevný na mieste */
         .hud-container {
             position: fixed;
             top: 30px;
@@ -144,7 +144,7 @@
             }
         }
 
-        /* Deformácia pri kliknutí */
+        /* Animácia deformácie pri kliknutí */
         button.clicked {
             animation: none;
             transform: scale(0.9) skewX(-3deg) skewY(3deg);
@@ -219,7 +219,7 @@
             50% { transform: translateY(-10px); }
         }
 
-        /* Resetovacie tlačidlo po výhre */
+        /* Resetovacie tlačidlo */
         .reset-btn {
             padding: 12px 30px;
             width: auto;
@@ -258,7 +258,7 @@
 </div>
 
 <script>
-const targetClicks = 1000;
+const targetClicks = 3000;
 let currentClicks = 0;
 
 const progressBar = document.getElementById("progress");
@@ -298,9 +298,9 @@ function createPopEffect(e) {
     if (e.clientX) {
         clickX = e.clientX;
         clickY = e.clientY;
-    } else if (e.touches && e.touches) {
-        clickX = e.touches.clientX;
-        clickY = e.touches.clientY;
+    } else if (e.touches && e.touches[0]) {
+        clickX = e.touches[0].clientX;
+        clickY = e.touches[0].clientY;
     } else {
         const rect = btn.getBoundingClientRect();
         clickX = rect.left + rect.width / 2;
@@ -318,7 +318,6 @@ function createPopEffect(e) {
 }
 
 function triggerWin() {
-    // Progress bar a text ostanú na mieste, len zmenia vizuál na oslavnú zlatú farbu
     progressBar.classList.add("gold-win");
     statusLabel.classList.add("gold-text");
     statusLabel.textContent = `DOKONČENÉ: ${currentClicks} KLIKOV!`;
@@ -332,7 +331,16 @@ function resetGame() {
     progressBar.style.width = "0%";
     statusLabel.textContent = "Klikni pre štart";
     
-    // Odstránenie zlatých efektov z progress baru
     progressBar.classList.remove("gold-win");
     statusLabel.classList.remove("gold-text");
     
+    gameContainer.classList.remove("blur");
+    winnerScreen.classList.remove("show");
+}
+
+btn.addEventListener("pointerdown", handleClick);
+
+</script>
+
+</body>
+</html>
